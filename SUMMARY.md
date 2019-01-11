@@ -3,8 +3,8 @@
 ### Introduction
 
 * [What is Qtum-x86](intro/whatis.md)
-* Toolchain setup
-* Hello World
+* [Toolchain setup](intro/toolchain.md)
+* [Hello World](intro/hello.md)
 * [New Features in Qtum-x86](intro/features.md)
     * UTXO Interaction
     * Contract Events

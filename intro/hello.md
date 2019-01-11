@@ -126,5 +126,35 @@ This will give a fairly large JSON output. There will be one for each contract e
 * events -- the actual events created by this execution. This is an array of key-value pairs
 * calls -- this is a recursive structure where other execution results (this json structure) are placed within it. There is one result for each contract call which takes place within the overall execution. It is possible for results to be nested multiple levels (note: this is subject to change)
 
+You'll see something like this at the bottom of the JSON output:
+
+          "modified-balances": {
+          },
+          "spent-vins": [
+          ]
+        },
+        "events": {
+          "Hello World": "Contract creation"
+        },
+        "calls": [
+        ]
+      }
+    ]
+
+The hello world event for contract creation is seen here. 
+
+In order to call the contract to test it (replacing the address with yours), do the following:
+
+    qx86cli callcontract xLUbyAmNUTRxLt67x5gDtDxBzWpLrH92Zn 00
+
+This will immediately return a JSON result. `callcontract` simply calls the contract locally and does NOT create a blockchain transaction. Thus, there are no fees etc associated with `callcontract`. In the JSON result you should now see `"Hello World": "Execution Success!"` in the events array. 
+
+In order to do the same thing but on the blockchain as an actual transaction, do the following:
+
+    qx86cli sendtocontract xLUbyAmNUTRxLt67x5gDtDxBzWpLrH92Zn 00
+    qx86cli generate 1 #create one block to confirm the transaction
+
+You will not see the large JSON result. In order to see it, you need to use `searchevents` again. 
+
 
 

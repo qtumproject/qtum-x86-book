@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>What is Qtum-x86 · GitBook</title>
+        <title>New Features in Qtum-x86 · GitBook</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.3">
@@ -57,10 +57,8 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="toolchain.html" />
     
-    
-    <link rel="prev" href="../" />
+    <link rel="prev" href="hello.html" />
     
 
     </head>
@@ -104,7 +102,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.2" data-path="whatis.html">
+        <li class="chapter " data-level="1.2" data-path="whatis.html">
             
                 <a href="whatis.html">
             
@@ -143,7 +141,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.5" data-path="features.html">
+        <li class="chapter active" data-level="1.5" data-path="features.html">
             
                 <a href="features.html">
             
@@ -675,7 +673,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >What is Qtum-x86</a>
+        <a href=".." >New Features in Qtum-x86</a>
     </h1>
 </div>
 
@@ -690,17 +688,36 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="what-is-qtum-x86">What is Qtum-x86</h1>
-<p>Qtum-x86 is the latest prototype from Qtum. It introduces the x86 Virtual Machine. Currently you can write smart contracts in C, but more languages will be supported in the future. This prototype is strictly a preview and the contract interface is subject to change before final release. </p>
-<p>This version of Qtum comes with the following restrictions:</p>
+                                <h1 id="new-features-in-qtum-x86">New Features in Qtum-x86</h1>
+<p>Qtum-x86 implements many features not supported for neither Ethereum&apos;s EVM nor Qtum&apos;s version of EVM. Many includes features expose the full power of the Qtum Account Abstraction Layer, making it more natural for contracts to interact with the UTXO model of Qtum. Other features are ones more natural in x86 or would be very difficult to implement with the EVM&apos;s design. </p>
+<h2 id="utxo-interaction">UTXO Interaction</h2>
+<p>Qtum-x86 contracts can directly interact with the various pieces of the transaction in which they are included. This can be used especially for a contract to &quot;withness&quot; an otherwise normal payment. The contract in this case would read what address (or addressses) spent coins in order for them to be sent to another address. The contract can log this action or do other processing, such as automatically releasing XRC20 tokens to the sender. This is possible in an EVM contract but is more complicated, and sending to different address types would require special care and otherwise abnormal transactions</p>
+<h2 id="contract-events">Contract Events</h2>
+<p>One of the greatest iterative improvements over the EVM is the implementation of contract events in Qtum-x86. Events (&quot;logs&quot; in Ethereum) are bits of data that are not saved directly into the blockchain, but can be proven to exist within it. In Ethereum this data is of a strict format consisting of up to 4 256 bit &quot;topics&quot; and 1 256 bit &quot;data&quot; field.. Thus, 256 bit hashes is typically used for any data larger than 256 bits. </p>
+<p>In Qtum-x86 events are flexible dynamic length key-value data with a helpful type ID for both fields. This allows for contracts to create data that can be easily read in it&apos;s intended presentation (ie, as an address, number, string) by users without special tooling or coding knowledge.  </p>
+<h2 id="contract-upgrades">Contract Upgrades</h2>
+<p>Contract upgrades are trivial in Qtum-x86 when compared to Solidity/EVM contracts. The biggest factor that contributes to this success, it is possible to modify contract bytecode within the contract itself. This eliminates the need for the infamously tedious proxy contract pattern in Solidity. There is no need to split state, address, and bytecode into separate contracts. This can be used for cheaper contract upgrades than otherwise as well. If the contract upgrade is very small, it might be possible to patch only a single area of bytecode. This reduces the amount of transaction size bloat and thus gas costs for such upgrades. There will later be an option to disable contract bytecode upgrades, making contracts capable of opting in to 100% immutability of their bytecode. </p>
+<p>The other contributing factor to easier contract upgrades is the explicit handling of state. In the EVM both key and value data in contract state is constricted to a 256 byte limit. This requires the Solidity compiler to automatically generate the actual key data used from a Solidity contract. This is a topic of constant improvement, but for the most part this prevents you from doing radical restructuring of how the code is layed out in a contract or doing major refactorings involving renaming of storage variables. In Qtum-x86 storage is managed explicitly by contracts without a &quot;variable&quot; abstraction. The dynamic length of key and value data allows for complex structures to be stored as either a key or a value, and thus allowing easy direct usage of Qtum-x86 storage. This allows for refactorings and upgrades to be trivially managed without great restriction. It also allows for easier data migration into different formats. </p>
+<p>The key data restriction in the EVM also contributes to a security problem not present in Qtum-x86. In the EVM, if some storage based array variable can be indexed to arbritrary values, it is possible to read or write to any variable that is &quot;later&quot; in the 256 bit storage key space. This vulnerability does not exist in Qtum and thus is it safe to allow for dynamic storage array indexing. </p>
+<h2 id="universal-address-system">Universal Address System</h2>
+<p>In Qtum there are many different types of addresses. This is strictly different from Ethereum, where only a single type of address exists which may be either a contract or public key depending on blockchain state. In Qtum there are several types:</p>
 <ul>
-<li>Must be used from Docker or compiled from source</li>
-<li>EVM contract usage is not supported</li>
-<li>The testnet and mainnet networks can not be used and will not sync. Only regtest is supported</li>
-<li>Orphaning blocks and reorganizing the blockchain will not work properly.</li>
-<li>Only the command line RPC interface is supported for x86 contracts, though the GUI will still work</li>
+<li>Pay to pubkey</li>
+<li>Pay to pubkeyhash</li>
+<li>Pay to scripthash</li>
+<li>Pay to witness pubkeyhash</li>
+<li>Pay to witness scripthash</li>
+<li>EVM contract</li>
+<li>x86 contract</li>
+<li>(potentially other VM addresses later or on private blockchains)</li>
 </ul>
-<p>Many things are still yet to be implemented, and bugs may exist. Bug reports are appreciated at our <a href="https://github.com/qtumproject/qtum/issues" target="_blank">github</a>.</p>
+<p>Previously in Qtum&apos;s EVM machine, it was only possible to interact with either EVM contracts or pay to pubkeyhash addresses. This was due to the design of the EVM which only allows 160 bits for an address. It is not possible to encode an address and a &quot;type&quot; within 160 bits without compromising the security of the address and some address types in Qtum can not fit into 160 bits. </p>
+<p>In Qtum-x86 we introduce the concept of a UniversalAddress. This is an address which encodes both type and data, and is intended to be of consistent format in mainnet, testnet, regtest, and even forks of the Qtum blockchain. This is strictly different from the Base58 encoding of addresses in Qtum. The &quot;type&quot; there also doubles as an easy to read prefix for the user. It would be bad if it were easy for a user to send mainnet tokens to testnet addresses or to mistake a mainnet address as being from the testnet or from a different blockchain. Thus, each blockchain type uses different &quot;prefixes&quot;. UniversalAddress on the otherhand is intended only for smart contract usage and should be mostly invisible to end users. Currently in Qtum-x86, the data portion of this address is fixed size, but in the future it will be of dynamic size. </p>
+<p>Along with the benefit of actually being capable of interacting with all of these address types, it is easily possible to filter and determine which type of address is being used without any blockchain information. </p>
+<h2 id="external-contract-state-access">External Contract State Access</h2>
+<p>In Qtum-x86 it is possible to read directly from an external contract&apos;s state. There is no need for &quot;getter&quot; functions as in Solidity/EVM contracts. Instead it is expected that each contract would publish a public state &quot;API&quot; consisting of the various keys guaranteed to stay the same format in the contract, even persisting through contract bytecode upgrades.</p>
+<h2 id="shared-contract-communication-stack-sccs">Shared Contract Communication Stack (SCCS)</h2>
+<p>A new memory area called the Shared Contract Communication Stack is available to Qtum-x86 smart contracts. This is a simple stack which all smart contracts in a single execution has access to. This stack is used for passing argument and return data between different contracts. The stack allows for multiple pieces of data to be managed separately, making it trivial to allow for dynamic numbers of parameters and return data. An ABI format is described later which has been built on top of this feature. </p>
 
                                 
                                 </section>
@@ -728,14 +745,10 @@
 
             
                 
-                <a href="../" class="navigation navigation-prev " aria-label="Previous page: Introduction">
+                <a href="hello.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page: Hello World">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
-                
-                <a href="toolchain.html" class="navigation navigation-next " aria-label="Next page: Toolchain setup">
-                    <i class="fa fa-angle-right"></i>
-                </a>
                 
             
         
@@ -744,7 +757,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"What is Qtum-x86","level":"1.2","depth":1,"next":{"title":"Toolchain setup","level":"1.3","depth":1,"path":"intro/toolchain.md","ref":"intro/toolchain.md","articles":[]},"previous":{"title":"Introduction","level":"1.1","depth":1,"path":"README.md","ref":"README.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"intro/whatis.md","mtime":"2019-01-14T17:17:18.695Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2019-01-15T02:55:01.937Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"New Features in Qtum-x86","level":"1.5","depth":1,"next":{"title":"UTXO Interaction","level":"1.5.1","depth":2,"ref":"","articles":[]},"previous":{"title":"Hello World","level":"1.4","depth":1,"path":"intro/hello.md","ref":"intro/hello.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"intro/features.md","mtime":"2019-01-14T17:17:18.695Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2019-01-14T17:17:46.851Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

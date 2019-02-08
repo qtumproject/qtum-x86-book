@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>Toolchain setup · GitBook</title>
+        <title>Libqtum Variables · GitBook</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.3">
@@ -57,10 +57,8 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="hello.html" />
+    <link rel="next" href="structs.md" />
     
-    
-    <link rel="prev" href="whatis.html" />
     
 
     </head>
@@ -104,9 +102,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.2" data-path="whatis.html">
+        <li class="chapter " data-level="1.2" data-path="../intro/whatis.html">
             
-                <a href="whatis.html">
+                <a href="../intro/whatis.html">
             
                     
                     What is Qtum-x86
@@ -117,9 +115,9 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.3" data-path="toolchain.html">
+        <li class="chapter " data-level="1.3" data-path="../intro/toolchain.html">
             
-                <a href="toolchain.html">
+                <a href="../intro/toolchain.html">
             
                     
                     Toolchain setup
@@ -130,9 +128,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4" data-path="hello.html">
+        <li class="chapter " data-level="1.4" data-path="../intro/hello.html">
             
-                <a href="hello.html">
+                <a href="../intro/hello.html">
             
                     
                     Hello World
@@ -143,9 +141,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.5" data-path="features.html">
+        <li class="chapter " data-level="1.5" data-path="../intro/features.html">
             
-                <a href="features.html">
+                <a href="../intro/features.html">
             
                     
                     New Features in Qtum-x86
@@ -436,9 +434,9 @@
             
         </li>
     
-        <li class="chapter " data-level="3.2" data-path="../prog-ref/variables.html">
+        <li class="chapter active" data-level="3.2" data-path="variables.html">
             
-                <a href="../prog-ref/variables.html">
+                <a href="variables.html">
             
                     
                     Libqtum Variables
@@ -449,7 +447,7 @@
             
         </li>
     
-        <li class="chapter " data-level="3.3" data-path="../prog-ref/structs.md">
+        <li class="chapter " data-level="3.3" data-path="structs.md">
             
                 <span>
             
@@ -462,9 +460,9 @@
             
         </li>
     
-        <li class="chapter " data-level="3.4" data-path="../prog-ref/functions.html">
+        <li class="chapter " data-level="3.4" data-path="functions.html">
             
-                <a href="../prog-ref/functions.html">
+                <a href="functions.html">
             
                     
                     Libqtum General Functions
@@ -475,9 +473,9 @@
             
         </li>
     
-        <li class="chapter " data-level="3.5" data-path="../prog-ref/states.html">
+        <li class="chapter " data-level="3.5" data-path="states.html">
             
-                <a href="../prog-ref/states.html">
+                <a href="states.html">
             
                     
                     Libqtum State and Event Functions
@@ -488,7 +486,7 @@
             
         </li>
     
-        <li class="chapter " data-level="3.6" data-path="../prog-ref/rpc.md">
+        <li class="chapter " data-level="3.6" data-path="rpc.md">
             
                 <span>
             
@@ -688,7 +686,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >Toolchain setup</a>
+        <a href=".." >Libqtum Variables</a>
     </h1>
 </div>
 
@@ -703,43 +701,58 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="toolchain-setup">Toolchain Setup</h1>
-<p>Currently there are no compiled binaries provided for Qtum-x86. Code changes happen too often to gain any value from setting up a binary compilation and distribution process. Thus, currently the toolchain and Qtum-x86 itself must be compiled from source. A dockerfile is provided to greatly simplify the build process, which is otherwise quite complex with several dependencies and OS specific steps. The Docker file and some utilities can be downloaded from: <a href="https://github.com/qtumproject/qtum-docker/tree/master/proto-x86" target="_blank">https://github.com/qtumproject/qtum-docker/tree/master/proto-x86</a></p>
-<p>The docker file is initially built as so:</p>
-<pre><code>docker build -t qtumx86 -f Dockerfile .
-</code></pre><p>This will take several hours on most computers, as it involves compiling the entire toolchain, twice (once for freestanding, once for Qtum) as well as Qtum itself. </p>
-<p>To rebuild the image from scratch (such as to update the version etc), use the <code>--no-cache</code> option:</p>
-<pre><code>docker build -t qtumx86 -f Dockerfile . --no-cache
-</code></pre><p>Once the docker image is built, it is fairly easy to use. In order to simplify things, some helper bash functions are provided. They will be used in this documentation, but are by no means a requirement. </p>
-<p>The helpers.sh file is the following:</p>
-<pre><code>#!/bin/bash
-function qx86start() {
-    docker run --rm -v &quot;${PWD}:/root/bind&quot; --name qx86 -d qtumx86 qtum/src/qtumd -regtest -logevents
-}
-export -f qx86start
+                                <h1 id="libqtum-variables">Libqtum Variables</h1>
+<p>All of these &quot;variables&quot; are actually fixed areas of memory. They are simply represented as structures and with various helper constants to simplify their usage and access. </p>
+<p>Some variables are purposefully oversized (such as a boolean in a 32-bit integer) to keep efficient alignment within the structures</p>
+<h2 id="execution-data">Execution Data</h2>
+<p>This is a read-only block of memory which contains data specifically about the current execution state. </p>
+<p>Note: </p>
+<pre><code>static const struct ExecDataABI* const qtumExec = (const struct ExecDataABI* const) EXEC_DATA_ADDRESS;
 
-function qx86stop() {
-    docker stop qx86
-}
-export -f qx86stop
+struct ExecDataABI{
+    //total size of execdata area
+    uint32_t size;
 
-alias qx86cli=&apos;docker exec qx86 qcli&apos;
+    uint32_t isCreate;
+    UniversalAddressABI sender;
+    uint64_t gasLimit;
+    uint64_t valueSent;
+    UniversalAddressABI origin;
+    UniversalAddressABI self;
+    uint32_t nestLevel;
+} __attribute__((__packed__));
+</code></pre><ul>
+<li>qtumExec-&gt;isCreate -- a boolean which is true (1) if the current execution will end in a new contract being created</li>
+<li>qtumExec-&gt;sender -- The contract or address which caused this contract to be executed. If this contract was not executed by another contract, it is the first address input in the transaction (TBD: vout signing in the future)</li>
+<li>qtumExec-&gt;gasLimit -- The total gas available for the current execution</li>
+<li>qtumExec-&gt;valueSent -- How many Qtum tokens were sent to the current contract by the current invocation</li>
+<li>qtumExec-&gt;origin -- the address which caused this entire call stack of contracts to initially be executed. This is the first address input in the contract transaction</li>
+<li>qtumExec-&gt;self -- The address of the current contract being executed</li>
+<li>qtumExec-&gt;nestLevel -- How many calls exist &quot;above&quot; this one. For instance, if the current execution is C and the call tree is A -&gt; B -&gt; C, then the nest level would be 2. At A (where there are no contract calls above it), the nest level would be 0</li>
+</ul>
+<h2 id="blockchain-data">Blockchain Data</h2>
+<p>This is a read-only block of memory which contains all the data about the current state of the blockchain as of the currently in-progress block. </p>
+<pre><code>static const struct BlockDataABI* const qtumBlockchain = (const struct BlockDataABI* const) BLOCK_DATA_ADDRESS;
 
-function qx86deploy() {
-    docker exec -t qx86 deploy_contract `hexdump -e \&quot;%x\&quot; $1` 
-}
-export -f qx86deploy
+struct BlockDataABI{
+    //total size of blockdata area
+    uint32_t size;
 
-function qx86tb() {
-    docker run --rm -v &quot;${PWD}:/root/bind&quot; qtumx86 x86tb
-}
-export -f qx86tb
-
-function qx86make() {
-    docker run --rm -v &quot;${PWD}:/root/bind&quot; qtumx86 qmake &quot;$@&quot;
-}
-export -f qx86make
-</code></pre><p>The file can easily be used in your current bash session by simply doing <code>source helpers.sh</code></p>
+    UniversalAddressABI blockCreator;
+    uint64_t blockGasLimit;
+    uint64_t blockDifficulty;
+    uint32_t blockHeight;
+    uint64_t previousTime;
+    qtum_hash32 blockHashes[256];
+} __attribute__((__packed__));
+</code></pre><ul>
+<li>qtumBlockchain-&gt;blockCreator -- The address which staked the coins to create the current block (or the first address that receives the coins from block generation in the case of proof of work for regtest)</li>
+<li>qtumBlockchain-&gt;blockGasLimit -- The total gas limit for the current block.</li>
+<li>qtumBlockchain-&gt;blockDifficulty -- The current difficulty of the block (for mining / staking)</li>
+<li>qtumBlockchain-&gt;blockHeight -- The current number of blocks in the blockchain</li>
+<li>qtumBlockchain-&gt;previousTime -- The timestamp of the previous block (to prevent potential race conditions which prevent contract executions from being batched before block creation)</li>
+<li>qtumBlockchain-&gt;blockHashes[] -- The hashes of the previous 256 blocks. 0 is the previous block, 1 is the one before that, etc. </li>
+</ul>
 
                                 
                                 </section>
@@ -767,12 +780,8 @@ export -f qx86make
 
             
                 
-                <a href="whatis.html" class="navigation navigation-prev " aria-label="Previous page: What is Qtum-x86">
-                    <i class="fa fa-angle-left"></i>
-                </a>
                 
-                
-                <a href="hello.html" class="navigation navigation-next " aria-label="Next page: Hello World">
+                <a href="structs.md" class="navigation navigation-next navigation-unique" aria-label="Next page: Libqtum Structures">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -783,7 +792,7 @@ export -f qx86make
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Toolchain setup","level":"1.3","depth":1,"next":{"title":"Hello World","level":"1.4","depth":1,"path":"intro/hello.md","ref":"intro/hello.md","articles":[]},"previous":{"title":"What is Qtum-x86","level":"1.2","depth":1,"path":"intro/whatis.md","ref":"intro/whatis.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"intro/toolchain.md","mtime":"2019-01-11T04:41:24.906Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2019-02-08T00:49:00.670Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Libqtum Variables","level":"3.2","depth":1,"next":{"title":"Libqtum Structures","level":"3.3","depth":1,"path":"prog-ref/structs.md","ref":"prog-ref/structs.md","articles":[]},"previous":{"title":"ABI format reference (not yet complete)","level":"3.1","depth":1,"ref":"","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"prog-ref/variables.md","mtime":"2019-02-08T00:46:41.604Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2019-02-08T00:54:28.238Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

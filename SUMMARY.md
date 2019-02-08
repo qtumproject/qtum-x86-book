@@ -32,16 +32,17 @@
 ### Programming Reference
 
 * ABI format reference (not yet complete)
-* Libqtum Variables
-* Libqtum General Functions
-* Libqtum State and Event Functions
-* Qtum-x86 RPC Call Reference
+* [Libqtum Variables](prog-ref/variables.md)
+* [Libqtum Structures](prog-ref/structs.md)
+* [Libqtum General Functions](prog-ref/functions.md)
+* [Libqtum State and Event Functions](prog-ref/states.md)
+* [Qtum-x86 RPC Call Reference](prog-ref/rpc.md)
 
 ### Toolchain Reference
 
 * Tools Available
 * Standard C Library
-* Memory Allocation (not yet implemented)
+* Memory Allocation
 * Compiling Toolchain from Source
 
 ### Toolchain Porting Reference

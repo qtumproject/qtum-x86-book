@@ -77,7 +77,7 @@ This is for adding static libraries to the contract.
 
 This is the actual bytecode file that is formatted for the Qtum blockchain. This is greatly simplified from ELF and although is a very easy to parse and use due to its limitations, no tools will support this (at least yet). When deploying this to the blockchain using `qx86deploy`, the Qtum RPC command "createcontract" is used, and the argument is this file which is dumped to a hex string. 
 
-These are the important things to know about modifying this Makefile. For most simple contracts, this will be sufficient. With more complicated ones involving many libraries etc, it may be ideal to to write a custom makefile using this for inspiration. 
+These are the important things to know about modifying this Makefile. For most simple contracts, this will be sufficient. With more complicated ones involving many libraries etc, it may be ideal to to write a custom makefile using this for inspiration. One last detail you should be aware of is that the easiest way to interact with the Makefile to ensure everything compiles would be to use `qx86make` rather than `make`. This sends your Makefile and C files up to the qx86 docker container where libraries are prepared and linked and ready for interaction. 
 
 In order to actually deploy this contract, you can use this script in a local shell (assuming you sourced the "helpers.sh" script from the toolchain setup)
 

@@ -83,6 +83,7 @@ In order to actually deploy this contract, you can use this script in a local sh
 
     qx86start
     qx86cli generate 600 # this will generate 600 blocks. This will start the chain and give us some coins to work with
+    qx86make # run this from the working directory of your C file and Makefile to get the .o, .elf, and .qbit files
     qx86deploy helloworld.qbit
     qx86cli generate 1 # generate 1 block so that we can mine our contract and ensure its processed
 

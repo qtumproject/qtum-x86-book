@@ -19,8 +19,8 @@
 
 ### Programming Walkthroughs
 
+* [State Registry](walkthroughs/state-registry.md)
 * Simple Payment Forwarding Contract
-* Voting Contract
 * Simple ERC20 (XRC20) Token Contract
 * Adding Crowdsale Features to the XRC20 Contract
 * Transaction Witness
